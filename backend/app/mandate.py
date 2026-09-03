@@ -23,3 +23,27 @@ class AllowedAction(str, Enum):
     ACCEPT_SUBSTITUTE = "accept_substitute"
     ACCEPT_DISCOUNT = "accept_discount"
     INITIATE_REFUND = "initiate_refund"
+    
+class Mandate(BaseModel):
+    mandate_id: UUID = Field(default_factory=uuid4)
+    protocol_source: ProtocolSource
+ 
+    buyer_agent_id: str      
+    principal_id: str       
+    merchant_id: str
+ 
+    scope: list[str]                     
+    allowed_actions: list[AllowedAction]
+ 
+    spend_ceiling: Decimal
+    spend_used: Decimal = Decimal("0")   
+    currency: str = "INR"
+ 
+    valid_from: datetime
+    expires_at: datetime
+ 
+    signature: str    
+    jti: str          
+    raw_source_payload: dict   
+ 
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
