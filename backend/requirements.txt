@@ -1,0 +1,12 @@
+   fastapi
+   uvicorn[standard]
+   pydantic
+   sqlalchemy
+   pyjwt
+   razorpay
+   requests
+   langgraph
+   langchain-groq
+   python-dotenv
+   pytest
+   httpx
