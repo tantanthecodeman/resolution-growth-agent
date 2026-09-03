@@ -5,7 +5,7 @@ from decimal import Decimal
 from enum import Enum
 from uuid import UUID, uuid4
  
-import jwt  # PyJWT
+import jwt  # PyJWT  # type: ignore[reportMissingImports]
 from pydantic import BaseModel, Field, field_validator, model_validator
  
  
