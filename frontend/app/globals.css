@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-paper: #EFF1EC;
+  --color-paper-raised: #F7F8F4;
+  --color-ink: #12211D;
+  --color-ink-soft: #4B564F;
+  --color-rule: #C7CCC2;
+  --color-rule-strong: #A9AF9F;
+  --color-verified: #2F6F4E;
+  --color-verified-bg: #E3ECE2;
+  --color-attention: #A6762E;
+  --color-attention-bg: #F3E9D6;
+  --color-danger: #8B3A3A;
+  --color-danger-bg: #F1E1DD;
+}
+
+@theme inline {
+  --color-paper: var(--color-paper);
+  --color-paper-raised: var(--color-paper-raised);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-rule: var(--color-rule);
+  --color-rule-strong: var(--color-rule-strong);
+  --color-verified: var(--color-verified);
+  --color-verified-bg: var(--color-verified-bg);
+  --color-attention: var(--color-attention);
+  --color-attention-bg: var(--color-attention-bg);
+  --color-danger: var(--color-danger);
+  --color-danger-bg: var(--color-danger-bg);
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+}
