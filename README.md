@@ -1,5 +1,3 @@
-Built for the Razorpay AI Buildathon, AI Growth & Agentic Commerce track.
-
 <div align="center">
 
 # Resolution & Growth Agent
