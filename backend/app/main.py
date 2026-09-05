@@ -195,11 +195,24 @@ def create_app(reasoner: Optional[Reasoner] = None) -> FastAPI:
         transaction_id = str(mandate.mandate_id)
         receipt = f"txn-{transaction_id}"
 
-        order = state.razorpay.create_order_idempotent(
-            transaction_id=transaction_id, amount=final_amount, currency=mandate.currency,
-            existing_order_lookup=lambda r: existing_order_for(transaction_id, r),
-            notes={"mandate_id": transaction_id, "sku": req.sku},
-        )
+        try:
+            order = state.razorpay.create_order_idempotent(
+                transaction_id=transaction_id, amount=final_amount, currency=mandate.currency,
+                existing_order_lookup=lambda r: existing_order_for(transaction_id, r),
+                notes={"mandate_id": transaction_id, "sku": req.sku},
+            )
+        except Exception as e:
+            # The gate already approved this -- a failure here is Razorpay itself
+            # (bad keys, a network blip, a real API error), not a policy question.
+            # Still must not 500 with no information: return a clear, structured
+            # response so the caller (and the ledger) can see settlement failed
+            # AFTER approval, which is a materially different, more concerning case
+            # than a gate rejection and should read as one.
+            return {
+                "outcome": "settlement_failed",
+                "reason": f"{type(e).__name__}: {e}",
+                "history": final_state["history"] + ["gate approved, but Razorpay settlement failed"],
+            }
 
         record = TransactionRecord(transaction_id=transaction_id, mandate=mandate,
                                     order_id=order.razorpay_order_id, amount=final_amount)

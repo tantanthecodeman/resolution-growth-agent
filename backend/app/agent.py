@@ -117,6 +117,7 @@ class GroqReasoner:
         )
         return self._llm.invoke([("system", SYSTEM_PROMPT), ("human", user_msg)])
 
+
 class GeminiReasoner:
     """Fallback reasoner for when Groq access is blocked (org/role restrictions on
     the console are a known, common snag). Requires langchain-google-genai and a
@@ -124,12 +125,12 @@ class GeminiReasoner:
     deliberately -- same SYSTEM_PROMPT, same structured-output contract via
     AgentProposal, same propose() signature -- so swapping between them is a
     one-line change in AppState._build_default_reasoner, never a graph change."""
- 
+
     def __init__(self, model: str = "gemini-2.0-flash", api_key: Optional[str] = None):
         from langchain_google_genai import ChatGoogleGenerativeAI  # lazy import,
         # same reasoning as GroqReasoner above
         self._llm = ChatGoogleGenerativeAI(model=model, google_api_key=api_key).with_structured_output(AgentProposal)
- 
+
     def propose(self, context: SessionContext, history: list[str]) -> AgentProposal:
         user_msg = (
             f"SKU: {context['sku']}\n"
@@ -189,7 +190,18 @@ def node_admit(state: AgentState, gate: PolicyGate, ledger: AuditLedger) -> Agen
 
 
 def node_reason(state: AgentState, reasoner: Reasoner) -> AgentState:
-    proposal = reasoner.propose(state["context"], state["history"])
+    try:
+        proposal = reasoner.propose(state["context"], state["history"])
+    except Exception as e:
+        # A flaky or misconfigured LLM call must never take the whole request
+        # down with it -- this is the same "never let a transaction block on a
+        # flaky model call" principle applied to a real failure mode, not just
+        # documented as an intention. Escalate honestly rather than crash or guess.
+        proposal = AgentProposal(
+            action=ProposedAction.ESCALATE_TO_MERCHANT,
+            rationale=f"Reasoner call failed ({type(e).__name__}: {e}); escalating rather than "
+                      f"blocking the transaction or guessing.",
+        )
     state["last_proposal"] = proposal
     state["history"].append(f"agent proposes: {proposal.action.value} — {proposal.rationale}")
     return state
