@@ -166,7 +166,6 @@ A transition outside this table is refused, not silently allowed. See `tests/tes
 
 Built as a financial register, not a generic analytics grid: tabular monospace for anything structured (amounts, hashes, timestamps), serif for the agent's actual reasoning prose. Open escalations render visibly unresolved (dashed, unfilled). Settled rows render closed. Approving or denying calls `POST /api/escalations/resolve`, which appends rather than edits, so the frontend's write path follows the same discipline as the backend it reads from.
 
-<details>
 <summary><strong>API reference</strong></summary>
 <br>
 
@@ -204,7 +203,6 @@ Response on success:
 
 An unresolved request returns `"outcome": "escalated"` or `"failed"` with the same `history` trail. Nothing is charged, and the reasoning is visible in the response itself, not buried in a log.
 
-</details>
 
 ## Demo scenario
 
@@ -242,8 +240,7 @@ No blockchain, no Temporal, no OPA yet, and that's stated plainly rather than hi
 
 Idempotency claims are protocol-accurate, not blanket. Razorpay gives native idempotency for refunds and not for orders, and this codebase reflects that instead of asserting a uniform guarantee that isn't true of the underlying API.
 
-<details>
-<summary><strong>Known issues and fixes</strong>, real bugs found while building this, kept here on purpose</summary>
+<summary><strong>Known issues and fixes</strong>, real bugs found while building this, kept here on purpose-</summary>
 <br>
 
 | Symptom | Root cause | Fix |
@@ -257,7 +254,6 @@ Idempotency claims are protocol-accurate, not blanket. Razorpay gives native ide
 | `RAZORPAY_KEY_ID` read as `None` despite a correct `.env` | `python-dotenv` was a listed dependency but `load_dotenv()` was never actually called | Added at module level in `main.py`, before `AppState` is built |
 | Groq console showed restricted API key access | Common org or role gating on Groq's console | Added `GeminiReasoner` behind the same `Reasoner` interface as a same-shape fallback |
 
-</details>
 
 ## Scope and status
 
