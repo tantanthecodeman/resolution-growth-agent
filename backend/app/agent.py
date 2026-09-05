@@ -126,7 +126,7 @@ class GeminiReasoner:
     AgentProposal, same propose() signature -- so swapping between them is a
     one-line change in AppState._build_default_reasoner, never a graph change."""
 
-    def __init__(self, model: str = "gemini-2.0-flash", api_key: Optional[str] = None):
+    def __init__(self, model: str = "gemini-3.6-flash", api_key: Optional[str] = None):
         from langchain_google_genai import ChatGoogleGenerativeAI  # lazy import,
         # same reasoning as GroqReasoner above
         self._llm = ChatGoogleGenerativeAI(model=model, google_api_key=api_key).with_structured_output(AgentProposal)
