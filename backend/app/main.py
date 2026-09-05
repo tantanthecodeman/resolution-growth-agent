@@ -40,7 +40,7 @@ from app.razorpay_client import RazorpayClient, OrderResult
 from app.fsm import FailureRecoveryFSM, TransactionRecord
 from app.webhook_route import build_webhook_router, TransactionStore
 from app.dashboard_api import build_dashboard_router
-from app.agent import build_agent, initial_state, ScriptedReasoner, GroqReasoner, AgentProposal, ProposedAction, Reasoner, SessionContext
+from app.agent import build_agent, initial_state, ScriptedReasoner, GroqReasoner, GeminiReasoner, AgentProposal, ProposedAction, Reasoner, SessionContext
 
 # Must run BEFORE any os.environ.get() call below -- including the ones inside
 # AppState.__init__, which is why this sits at module level, right after the
@@ -69,8 +69,15 @@ class AppState:
 
     @staticmethod
     def _build_default_reasoner() -> Reasoner:
+        # Groq checked first (fast, and the original choice) -- falls through to
+        # Gemini if no Groq key is configured, since Groq's console has a known,
+        # common access-restriction snag (org/role gating) that Gemini's signup
+        # doesn't share. Either path produces the same Reasoner shape, so nothing
+        # downstream of this function needs to know or care which one is live.
         if os.environ.get("GROQ_API_KEY"):
             return GroqReasoner(api_key=os.environ["GROQ_API_KEY"])
+        if os.environ.get("GOOGLE_API_KEY"):
+            return GeminiReasoner(api_key=os.environ["GOOGLE_API_KEY"])
         # No key configured — fall back to a reasoner that always escalates rather
         # than silently guessing. The app stays runnable without a key; it just
         # can't make autonomous judgment calls, which is the honest behavior.
