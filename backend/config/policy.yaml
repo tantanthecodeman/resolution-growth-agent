@@ -1,0 +1,9 @@
+# Per-merchant policy. Read into app.policy_gate.PolicyConfig at startup.
+# This file is what a merchant (or a judge) can read to know exactly what the
+# system will and won't do automatically -- no code-reading required.
+merchant_id: m-1
+max_auto_discount_pct: 5
+price_drift_tolerance_pct: 3
+max_substitution_price_diff_pct: 10
+max_auto_refund_amount: 2000
+replay_window_seconds: 900
