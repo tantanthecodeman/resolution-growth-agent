@@ -11,3 +11,4 @@
    pytest
    httpx
    psycopg2-binary
+   langchain-google-genai
