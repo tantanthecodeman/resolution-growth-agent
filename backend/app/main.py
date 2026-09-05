@@ -134,6 +134,15 @@ def create_app(reasoner: Optional[Reasoner] = None) -> FastAPI:
     ))
     app.include_router(build_dashboard_router(state.ledger))
 
+    @app.get("/health")
+    def health():
+        """Deliberately does nothing but confirm the process is alive: no DB
+        query, no gate, no ledger read. This exists specifically so an uptime
+        pinger (UptimeRobot or similar) can keep Render's free tier from cold-
+        starting before a judge opens the dashboard, without generating load
+        against Postgres or polluting the ledger with synthetic traffic."""
+        return {"status": "ok"}
+
     # -----------------------------------------------------------------------
     # Buyer-agent entrypoint
     # -----------------------------------------------------------------------
