@@ -117,6 +117,29 @@ class GroqReasoner:
         )
         return self._llm.invoke([("system", SYSTEM_PROMPT), ("human", user_msg)])
 
+class GeminiReasoner:
+    """Fallback reasoner for when Groq access is blocked (org/role restrictions on
+    the console are a known, common snag). Requires langchain-google-genai and a
+    GOOGLE_API_KEY from aistudio.google.com. Identical shape to GroqReasoner
+    deliberately -- same SYSTEM_PROMPT, same structured-output contract via
+    AgentProposal, same propose() signature -- so swapping between them is a
+    one-line change in AppState._build_default_reasoner, never a graph change."""
+ 
+    def __init__(self, model: str = "gemini-2.0-flash", api_key: Optional[str] = None):
+        from langchain_google_genai import ChatGoogleGenerativeAI  # lazy import,
+        # same reasoning as GroqReasoner above
+        self._llm = ChatGoogleGenerativeAI(model=model, google_api_key=api_key).with_structured_output(AgentProposal)
+ 
+    def propose(self, context: SessionContext, history: list[str]) -> AgentProposal:
+        user_msg = (
+            f"SKU: {context['sku']}\n"
+            f"Agent's last-seen price: {context['agent_seen_price']}\n"
+            f"Current live price: {context['live_price']}\n"
+            f"Order amount: {context['order_amount']}\n"
+            f"What has happened so far this session:\n" + "\n".join(f"- {h}" for h in history)
+        )
+        return self._llm.invoke([("system", SYSTEM_PROMPT), ("human", user_msg)])
+
 
 class ScriptedReasoner:
     """Deterministic stand-in for local tests, CI, and this sandbox — anywhere no LLM
